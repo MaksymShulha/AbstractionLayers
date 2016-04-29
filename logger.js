@@ -1,33 +1,31 @@
 var fs = require('fs');
 var logFile = 'log.log';
+
 var errMessage = function(err, callback){
 	var message = {
-		'error': err.toString()
+		error: err.toString()
 	}
 	callback(message);
 }
 var reqMessage = function(req, callback){
 	var message = {
-		'req method': req.method,
-		'req url': req.url
+		reqMethod: req.method,
+		reqUrl: req.url
 	}
 	callback(message);
 }
-var cacheMessage = function(data, callback){
+var cacheMessage = function(obj, callback){
 	var message = {
-		'operation': 'getFromCache',
-		'data': data
+		cacheOperation: obj.method,
+		data: obj.data
 	}
-
-
 	callback(message);
 }
-
 var logType = {
-    'err': errMessage,
-    'req': reqMessage,
-    'res': reqMessage,
-    'cache': cacheMessage
+    err: errMessage,
+    req: reqMessage,
+    res: reqMessage,
+    cache: cacheMessage
 };
 /*var resMessage = function(res, callback){
 	var message = {
@@ -36,15 +34,25 @@ var logType = {
 	}
 	callback(message);
 }*/
+var formaters = {
+	err: function (msg){ return '' + msg.time + ' ' + msg.type + ' ' + msg.error; },
+	req: function (msg){ return '' + msg.time + ' ' + msg.type + ' ' + msg.reqMethod + ' ' + msg.reqUrl; },
+	cache: function (msg){ return '' + msg.time + ' ' + msg.type + ' ' + msg.cacheOperation + ' ' + msg.data; }
+}
 
+var formatMessage = function (message) {
+    //var fmt = formaters[message.type];
+    //if (!fmt || typeof(fmt) !== 'function') fmt = (msg) => `${msg.time} ${msg.type} ${JSON.stringify(msg)}`;
+    return formaters[message.type](message);
+}
 var logger = function (type, obj) {
-
 	logType[type](obj, function(message){
+		message.type = type;
 		message.time = new Date().toISOString();
-		console.log(message);
-		fs.appendFile(logFile, JSON.stringify(message));
-		//fs.appendFile(logFile, '\n\n\n');
-	})
+		var msg = formatMessage(message);
+		console.log(msg);
+		fs.appendFile(logFile, msg);
+	});
 }
 
 module.exports = {

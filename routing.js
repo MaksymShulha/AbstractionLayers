@@ -10,4 +10,4 @@ var getRoute = function (key, callback) {
 
 module.exports = {
 	getRoute: getRoute
-}
+};

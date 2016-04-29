@@ -7,8 +7,8 @@ var parseCookies = function (req, callback) {
     });
     req.cookies = JSON.stringify(cookies);
     callback(req);
-}
+};
 
 module.exports = {
 	parseCookies: parseCookies
-}
+};

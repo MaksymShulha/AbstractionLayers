@@ -9,14 +9,14 @@ var getParceData = function (data, callback) {
     delete obj.birth;
     var data = JSON.stringify(obj);
     callback(data);
-}
+};
 var postParceData = function(body, callback){
 	var data = Buffer.concat(body).toString();
     var obj = JSON.parse(data);
     if (obj.name) obj.name = obj.name.trim();
     data = JSON.stringify(obj);
     callback(data);
-}
+};
 var postBusinessLogic = function (data, callback) {
     fs.writeFile('./person.json', data, function (err) {
         if (!err) {
@@ -26,10 +26,10 @@ var postBusinessLogic = function (data, callback) {
             callback(500, 'Write error');
         }
     });
-}
+};
 
 module.exports = {
 	getParceData: getParceData,
     postParceData: postParceData,
     postBusinessLogic: postBusinessLogic
-}
+};

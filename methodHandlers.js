@@ -4,12 +4,10 @@ var fs = require('fs'),
 
 var getPerson = function (req, res, callback) {
     cache.getFromCache(req.url, function(cacheResult){
-
         var head = {
             'Set-Cookie': 'mycookie=test',
             'Content-Type': 'text/html'
         };
-
         if (cacheResult == undefined) {
             fs.readFile('./person.json', function (err, data) {
                 if (!err) {
