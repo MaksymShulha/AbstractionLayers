@@ -1,33 +1,41 @@
-var fs = require('fs');
+var fs = require('fs'),
+    bL = require('./businessLogic.js'),
+    cache = require('./cache.js');
 
 var getPerson = function (req, res, callback) {
-    fs.readFile('./person.json', function (err, data) {
-        if (!err) {
-            var head = {
-                'Set-Cookie': 'mycookie=test',
-                'Content-Type': 'text/html'
-            };
-            callback(200, head, businessLogic(data));
+    cache.getFromCache(req.url, function(cacheResult){
+
+        var head = {
+            'Set-Cookie': 'mycookie=test',
+            'Content-Type': 'text/html'
+        };
+
+        if (cacheResult == undefined) {
+            fs.readFile('./person.json', function (err, data) {
+                if (!err) {
+                    bL.getParceData(data, function(){
+                        cache.putInCache(req.url, data);
+                        callback(200, head, data);
+                    });
+                } else {
+                    log.logger('err', err);
+                }
+            });
+
+        } else {
+            callback(200, head, cacheResult);
         }
     });
+
 };
 var postPerson = function (req, res, callback) {
     var body = [];
     req.on('error', function () { console.log('error'); }).on('data', function (chunk) {
-        console.log('' + chunk);
         body.push(chunk);
     }).on('end', function () {
-        var data = Buffer.concat(body).toString();
-        var obj = JSON.parse(data);
-        if (obj.name) obj.name = obj.name.trim();
-        data = JSON.stringify(obj);
-        //cache[req.url] = data;
-        fs.writeFile('./person.json', data, function (err) {
-            if (!err) {
-                callback(200, 'File saved');
-            } else {
-                callback(500, 'Write error');
-            }
+        bL.postParceData(body, function(data){
+            cache.putInCache(req.url, data);
+            bL.postBusinessLogic(data, callback);
         });
     });
 };

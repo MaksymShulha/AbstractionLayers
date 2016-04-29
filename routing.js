@@ -1,16 +1,13 @@
 var handler = require('./handlers.js');
 
-var exports = module.exports = {};
-
 var routing = {
-    '/': handler.createStartPage,
+    '/': handler.startPageHandler,
     '/person': handler.personHandler
 };
-exports.getRoute = function (key, callback) {
-    console.log(key);
-    console.log(routing[key]);
+var getRoute = function (key, callback) {
     callback(routing[key]);
 };
 
-
-//module.exports = getRoute;
+module.exports = {
+	getRoute: getRoute
+}
